@@ -32,12 +32,15 @@ passport.use(
     async (jwtPayload, done) => {
       try {
         const user = await User.findOne({ where: { uuid: jwtPayload.uuid } });
-
+        console.log(user);
         if (user) {
-          done(false, null);
+          return done(false, user);
         }
+
+        return done('user does not exist');
       } catch (err) {
-        done(err);
+        console.log(err.message);
+        return done(err);
       }
     },
   ),

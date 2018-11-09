@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 
 const MIN_PWD_LENGTH = 7;
 
-export default class User extends Model {
+export default class user extends Model {
   static init(sequelize, DataTypes) {
     return super.init(
       {
