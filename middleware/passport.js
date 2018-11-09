@@ -32,7 +32,6 @@ passport.use(
     async (jwtPayload, done) => {
       try {
         const user = await User.findOne({ where: { uuid: jwtPayload.uuid } });
-        console.log(user);
         if (user) {
           return done(false, user);
         }
