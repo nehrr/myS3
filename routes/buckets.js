@@ -36,6 +36,22 @@ api.get('/', async (req, res) => {
   }
 });
 
+api.head('/:id', async (req, res) => {
+  try {
+    const bucket = await Bucket.findById(req.params.id);
+
+    if (bucket) {
+      console.log('exists');
+      res.status(200).end();
+    } else {
+      console.log('does not exist');
+      res.status(400).end();
+    }
+  } catch (err) {
+    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+  }
+});
+
 api.get('/:id', async (req, res) => {
   try {
     const bucket = await Bucket.findById(req.params.id);
@@ -55,7 +71,6 @@ api.delete('/:id', async (req, res) => {
 });
 
 api.put('/:id', async (req, res) => {
-  console.log(req.params);
   try {
     const bucket = await Bucket.findById(req.params.id);
 
