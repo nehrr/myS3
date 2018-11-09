@@ -12,7 +12,6 @@ export default class blob extends Model {
         name: {
           type: DataTypes.STRING,
           allowNull: false,
-          unique: { args: true, msg: 'blob already exists' },
         },
         path: {
           type: DataTypes.STRING,

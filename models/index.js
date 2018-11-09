@@ -12,6 +12,7 @@ export const db = new Sequelize(process.env.DATABASE_URL, {
     underscored: true,
   },
 });
+
 const modelUser = User.init(db, Sequelize);
 const modelBlob = Blob.init(db, Sequelize);
 const modelBucket = Bucket.init(db, Sequelize);

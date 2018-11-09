@@ -3,6 +3,7 @@ import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import Mailer from '../lib/mail';
+import Filesystem from '../lib/filesystem';
 
 const api = Router();
 
@@ -19,6 +20,7 @@ api.post('/register', async (req, res) => {
     });
     await user.save();
     Mailer.send(user.email, 'Welcome', `Hello ${user.nickname}`, `<h1>Hello ${user.nickname}</h1>`);
+    Filesystem.createUser(user.uuid);
 
     const payload = { uuid: user.uuid, nickname, email };
     const token = jwt.sign(payload, process.env.JWT_ENCRYPTION);

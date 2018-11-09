@@ -12,7 +12,6 @@ export default class bucket extends Model {
         name: {
           type: DataTypes.STRING,
           allowNull: false,
-          unique: { args: true, msg: 'bucket already exists' },
         },
       },
 
