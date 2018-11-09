@@ -11,6 +11,7 @@ api.post('/register', async (req, res) => {
   const {
     nickname, email, password, password_confirmation,
   } = req.body;
+
   try {
     const user = new User({
       nickname,
@@ -18,9 +19,15 @@ api.post('/register', async (req, res) => {
       password,
       password_confirmation,
     });
+
     await user.save();
     Mailer.send(user.email, 'Welcome', `Hello ${user.nickname}`, `<h1>Hello ${user.nickname}</h1>`);
-    Filesystem.createUser(user.uuid);
+
+    try {
+      Filesystem.createUser(user.uuid);
+    } catch (err) {
+      res.status(400).json({ err: err.message });
+    }
 
     const payload = { uuid: user.uuid, nickname, email };
     const token = jwt.sign(payload, process.env.JWT_ENCRYPTION);

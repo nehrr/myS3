@@ -6,19 +6,22 @@ const api = Router();
 
 api.post('/', async (req, res) => {
   const { name } = req.body;
-  const { uuid } = req.user;
+  const { id } = req.params;
+  console.log(req.params);
 
-  try {
-    const blob = new Blob({
-      name,
-      user_uuid: uuid,
-    });
-    await blob.save();
-
-    res.status(201).json({ data: { bucket }, meta: {} });
-  } catch (err) {
-    res.status(400).json({ err });
-  }
+  // try {
+  res.status(200).json();
+  // const blob = new Blob({
+  //   name,
+  //   path: 'pathh',
+  //   size: 'size',
+  //   bucket_id: id,
+  // });
+  // await blob.save();
+  // res.status(201).json({ data: { blob }, meta: {} });
+  // } catch (err) {
+  //   res.status(400).json({ err });
+  // }
 });
 
 api.get('/', async (req, res) => {
@@ -47,8 +50,8 @@ api.get('/:id', async (req, res) => {
 
 api.delete('/:id', async (req, res) => {
   try {
-    const blob = await Blob.destroy({ where: { id: req.params.id } });
-    res.status(204).json({ blob });
+    await Blob.destroy({ where: { id: req.params.id } });
+    res.status(204).json();
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
   }

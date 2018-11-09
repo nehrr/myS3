@@ -53,8 +53,24 @@ api.get('/:id', async (req, res) => {
 
 api.delete('/:id', async (req, res) => {
   try {
-    const bucket = await Bucket.destroy({ where: { id: req.params.id } });
-    res.status(204).json({ bucket });
+    await Bucket.destroy({ where: { id: req.params.id } });
+    res.status(204).json();
+  } catch (err) {
+    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+  }
+});
+
+api.put('/:id', async (req, res) => {
+  console.log(req.params);
+  try {
+    const bucket = await Bucket.findById(req.params.id);
+
+    if (bucket) {
+      const fields = pick(req.body, ['name']);
+
+      await bucket.update(fields);
+      res.status(204).json();
+    }
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
   }

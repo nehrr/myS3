@@ -13,7 +13,7 @@ api.get('/', (req, res) => {
 
 api.use('/users', passport.authenticate('jwt', { session: false }), users);
 api.use('/auth', auth);
-api.use('/users/:uuid/:bucket/blob', passport.authenticate('jwt', { session: false }), blobs);
-api.use('/users/:uuid/bucket', passport.authenticate('jwt', { session: false }), buckets);
+api.use('/users/:uuid/buckets/:id/blob', passport.authenticate('jwt', { session: false }), blobs);
+api.use('/users/:uuid/buckets', passport.authenticate('jwt', { session: false }), buckets);
 
 export default api;
