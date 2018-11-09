@@ -36,13 +36,7 @@ api.get('/', async (req, res) => {
 api.get('/:id', async (req, res) => {
   try {
     const blob = await Blob.findById(req.params.id);
-
-    if (blob) {
-      const fields = pick(req.body, ['name']);
-      await blob.update(fields);
-
-      res.status(204).json();
-    }
+    res.status(200).json({ data: { blob } });
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
   }

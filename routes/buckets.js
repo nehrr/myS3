@@ -39,13 +39,7 @@ api.get('/', async (req, res) => {
 api.get('/:id', async (req, res) => {
   try {
     const bucket = await Bucket.findById(req.params.id);
-
-    if (bucket) {
-      const fields = pick(req.body, ['name']);
-      await bucket.update(fields);
-
-      res.status(200).json({ bucket });
-    }
+    res.status(200).json({ data: { bucket } });
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
   }

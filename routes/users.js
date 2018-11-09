@@ -16,7 +16,7 @@ api.get('/', async (req, res) => {
 api.get('/:uuid', async (req, res) => {
   try {
     const user = await User.findById(req.params.uuid);
-    res.status(200).json({ user });
+    res.status(200).json({ data: { user } });
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
   }
@@ -24,7 +24,7 @@ api.get('/:uuid', async (req, res) => {
 
 api.delete('/:uuid', async (req, res) => {
   try {
-    const user = await User.destroy({ where: { uuid: req.params.uuid } });
+    await User.destroy({ where: { uuid: req.params.uuid } });
     res.status(204).json();
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
