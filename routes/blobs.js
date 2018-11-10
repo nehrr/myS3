@@ -2,19 +2,18 @@ import { Router } from 'express';
 import { pick } from 'lodash';
 import Blob from '../models/blob';
 
-const api = Router();
+const api = Router({ mergeParams: true });
 
 api.post('/', async (req, res) => {
-  const { name } = req.body;
-  // const { id } = req.params;
-  // console.log(req.params);
+  const { name, path, size } = req.body;
+  const { id } = req.params;
 
   try {
     const blob = new Blob({
       name,
-      path: 'patth',
-      size: 'size',
-      bucket_id: 3,
+      path,
+      size,
+      bucket_id: id,
     });
     await blob.save();
     res.status(201).json({ data: { blob }, meta: {} });
@@ -25,8 +24,8 @@ api.post('/', async (req, res) => {
 
 api.get('/', async (req, res) => {
   try {
-    // get bucket id
-    const blobs = await Blob.findAll({ where: { bucket_id: 2 } });
+    const { id } = req.params;
+    const blobs = await Blob.findAll({ where: { bucket_id: id } });
     res.status(200).json({ data: { blobs }, meta: {} });
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
