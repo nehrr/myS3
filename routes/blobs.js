@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { pick } from 'lodash';
 import Blob from '../models/blob';
+import { getExtension } from '../lib/utils';
 
 const api = Router({ mergeParams: true });
 
@@ -16,6 +17,36 @@ api.post('/', async (req, res) => {
       bucket_id: id,
     });
     await blob.save();
+    res.status(201).json({ data: { blob }, meta: {} });
+  } catch (err) {
+    res.status(400).json({ err });
+  }
+});
+
+api.post('/duplicate/:id', async (req, res) => {
+  // const { name, path, size } = req.body;
+  const { id } = req.params;
+  console.log(req.params);
+
+  try {
+    const blob = await Blob.findById(id);
+    const {
+      name, path, size, bucket_id,
+    } = blob;
+    const { name: filename, extension } = getExtension(name);
+    const newName = `${filename}.copy${extension}`;
+    let newPath = path.substr(0, path.length - (filename.length - 1 + extension.length - 1));
+    newPath = `${newPath}${newName}`;
+    console.log(newPath);
+
+    const newBlob = new Blob({
+      name: newName,
+      path: newPath,
+      size,
+      bucket_id,
+    });
+
+    await newBlob.save();
     res.status(201).json({ data: { blob }, meta: {} });
   } catch (err) {
     res.status(400).json({ err });
