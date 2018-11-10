@@ -38,7 +38,8 @@ api.get('/', async (req, res) => {
 
 api.head('/:id', async (req, res) => {
   try {
-    const bucket = await Bucket.findById(req.params.id);
+    const { id } = req.params;
+    const bucket = await Bucket.findById(id);
 
     if (bucket) {
       console.log('exists');
@@ -54,7 +55,8 @@ api.head('/:id', async (req, res) => {
 
 api.get('/:id', async (req, res) => {
   try {
-    const bucket = await Bucket.findById(req.params.id);
+    const { id } = req.params;
+    const bucket = await Bucket.findById(id);
     res.status(200).json({ data: { bucket } });
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
@@ -63,25 +65,38 @@ api.get('/:id', async (req, res) => {
 
 api.delete('/:id', async (req, res) => {
   try {
-    await Bucket.destroy({ where: { id: req.params.id } });
+    const { id } = req.params;
+    const { uuid } = req.user;
+
+    const bucket = await Bucket.findById(id);
+    const { name } = bucket;
+    await Bucket.destroy({ where: { id } });
+    Filesystem.removeBucket(uuid, name);
     res.status(204).json();
   } catch (err) {
-    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+    res.status(400).json({ err: err.message });
   }
 });
 
 api.put('/:id', async (req, res) => {
   try {
-    const bucket = await Bucket.findById(req.params.id);
+    const { id } = req.params;
+    const { uuid } = req.user;
+
+    const bucket = await Bucket.findById(id);
+    const { name } = bucket;
 
     if (bucket) {
       const fields = pick(req.body, ['name']);
+      const newName = fields.name;
+
+      Filesystem.renameBucket(uuid, name, newName);
 
       await bucket.update(fields);
       res.status(204).json();
     }
   } catch (err) {
-    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+    res.status(400).json({ err: err.message });
   }
 });
 

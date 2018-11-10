@@ -17,7 +17,7 @@ const modelUser = User.init(db, Sequelize);
 const modelBlob = Blob.init(db, Sequelize);
 const modelBucket = Bucket.init(db, Sequelize);
 
-modelUser.hasMany(Bucket, { as: 'buckets' });
+modelUser.hasMany(Bucket, { as: 'buckets', onDelete: 'cascade' });
 modelBucket.belongsTo(User, { as: 'user' });
-modelBucket.hasMany(Blob, { as: 'blobs' });
+modelBucket.hasMany(Blob, { as: 'blobs', onDelete: 'cascade' });
 modelBlob.belongsTo(Bucket, { as: 'bucket' });

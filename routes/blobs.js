@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { pick } from 'lodash';
 import Blob from '../models/blob';
 import { getExtension } from '../lib/utils';
 
@@ -24,9 +23,7 @@ api.post('/', async (req, res) => {
 });
 
 api.post('/duplicate/:id', async (req, res) => {
-  // const { name, path, size } = req.body;
   const { id } = req.params;
-  console.log(req.params);
 
   try {
     const blob = await Blob.findById(id);
@@ -37,7 +34,6 @@ api.post('/duplicate/:id', async (req, res) => {
     const newName = `${filename}.copy${extension}`;
     let newPath = path.substr(0, path.length - (filename.length - 1 + extension.length - 1));
     newPath = `${newPath}${newName}`;
-    console.log(newPath);
 
     const newBlob = new Blob({
       name: newName,
@@ -63,9 +59,20 @@ api.get('/', async (req, res) => {
   }
 });
 
+api.get('/metadata/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const blob = await Blob.findById(id);
+    res.status(200).json({ data: { blob: { metadata: { size: blob.size, path: blob.path } } } });
+  } catch (err) {
+    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+  }
+});
+
 api.get('/:id', async (req, res) => {
   try {
-    const blob = await Blob.findById(req.params.id);
+    const { id } = req.params;
+    const blob = await Blob.findById(id);
     res.status(200).json({ data: { blob } });
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
