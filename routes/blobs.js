@@ -133,4 +133,16 @@ api.delete('/:id', async (req, res) => {
   }
 });
 
+api.get('/download/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const blob = await Blob.findById(id);
+    const { path } = blob;
+    res.download(path);
+  } catch (e) {
+    res.status(400).json({ err: 'could not download file' });
+  }
+});
+
 export default api;
