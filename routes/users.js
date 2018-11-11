@@ -11,7 +11,7 @@ api.get('/', async (req, res) => {
 
     res.status(200).json({ data: { users }, meta: {} });
   } catch (err) {
-    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+    res.status(400).json({ err: `could not get users, err: ${err.message}` });
   }
 });
 
@@ -22,7 +22,7 @@ api.get('/:uuid', async (req, res) => {
 
     res.status(200).json({ data: { user } });
   } catch (err) {
-    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+    res.status(400).json({ err: `could not get user, err: ${err.message}` });
   }
 });
 
@@ -34,7 +34,7 @@ api.delete('/:uuid', async (req, res) => {
 
     res.status(204).json();
   } catch (err) {
-    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+    res.status(400).json({ err: `could not delete user, err: ${err.message}` });
   }
 });
 
@@ -50,7 +50,7 @@ api.put('/:uuid', async (req, res) => {
       res.status(204).json();
     }
   } catch (err) {
-    res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
+    res.status(400).json({ err: `could not modify user, err: ${err.message}` });
   }
 });
 
