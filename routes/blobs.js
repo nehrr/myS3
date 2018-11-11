@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
       const pathName = path.join('/opt/workspace/myS3/', uuid, bucket.name);
       cb(null, pathName);
     } catch (e) {
-      throw new Error('could not get bucket name');
+      throw new Error('could not get bucket');
     }
   },
   filename(req, file, cb) {
@@ -139,6 +139,7 @@ api.get('/download/:id', async (req, res) => {
   try {
     const blob = await Blob.findById(id);
     const { path } = blob;
+
     res.download(path);
   } catch (e) {
     res.status(400).json({ err: 'could not download file' });
