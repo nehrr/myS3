@@ -1,21 +1,57 @@
 import { Router } from 'express';
+import multer from 'multer';
+import path from 'path';
 import Blob from '../models/blob';
+import Bucket from '../models/bucket';
 import { getExtension } from '../lib/utils';
+import Filesystem from '../lib/filesystem';
 
 const api = Router({ mergeParams: true });
 
-api.post('/', async (req, res) => {
-  const { name, path, size } = req.body;
+const storage = multer.diskStorage({
+  async destination(req, file, cb) {
+    const { uuid } = req.user;
+    const { id } = req.params;
+
+    try {
+      const bucket = await Bucket.findById(id);
+      const pathName = path.join('/opt/workspace/myS3/', uuid, bucket.name);
+      cb(null, pathName);
+    } catch (e) {
+      throw new Error('could not get bucket name');
+    }
+  },
+  filename(req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+api.post('/', upload.single('blob'), async (req, res) => {
   const { id } = req.params;
+  const { uuid } = req.user;
 
   try {
+    if (!req.file) {
+      req.status(400).json({ err: 'no file was sent or file was corrupted' });
+    }
+
+    const { originalname, size } = req.file;
+
+    const bucket = await Bucket.findById(id);
+
+    const pathName = path.join('/opt/workspace/myS3/', uuid, bucket.name, originalname);
+
     const blob = new Blob({
-      name,
-      path,
+      name: originalname,
+      path: pathName,
       size,
       bucket_id: id,
     });
+
     await blob.save();
+
     res.status(201).json({ data: { blob }, meta: {} });
   } catch (err) {
     res.status(400).json({ err });
@@ -30,9 +66,10 @@ api.post('/duplicate/:id', async (req, res) => {
     const {
       name, path, size, bucket_id,
     } = blob;
+
     const { name: filename, extension } = getExtension(name);
     const newName = `${filename}.copy${extension}`;
-    let newPath = path.substr(0, path.length - (filename.length - 1 + extension.length - 1));
+    let newPath = path.substr(0, path.length - (filename.length + extension.length));
     newPath = `${newPath}${newName}`;
 
     const newBlob = new Blob({
@@ -42,10 +79,13 @@ api.post('/duplicate/:id', async (req, res) => {
       bucket_id,
     });
 
+    Filesystem.duplicateBlob(path, newPath);
+
     await newBlob.save();
+
     res.status(201).json({ data: { blob }, meta: {} });
   } catch (err) {
-    res.status(400).json({ err });
+    res.status(400).json({ err: 'error' });
   }
 });
 
@@ -80,8 +120,13 @@ api.get('/:id', async (req, res) => {
 });
 
 api.delete('/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    await Blob.destroy({ where: { id: req.params.id } });
+    const blob = await Blob.findById(id);
+    const { path } = blob;
+    await Blob.destroy({ where: { id } });
+    Filesystem.removeBlob(path);
+
     res.status(204).json();
   } catch (err) {
     res.status(400).json({ err: `could not connect to database, err: ${err.message}` });
