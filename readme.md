@@ -56,14 +56,15 @@ $ npm run dev
 
 create and fill .env with:
 
-> > PORT
-> > APP
-> > DATABASE_URL
-> > MAILER_HOST
-> > MAILER_PORT
-> > JWT_ENCRYPTION
+>>PORT
+APP
+DATABASE_URL
+MAILER_HOST
+MAILER_PORT
+JWT_ENCRYPTION
 
 APP should be development, DATABASE used on development was postgres
+
 for emails sent on register, run a local MailDev server
 
 ![alt text](https://media.giphy.com/media/WiM5K1e9MtEic/giphy.gif)
